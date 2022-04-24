@@ -45,7 +45,14 @@ public partial class MainWindow {
 			var hitCount = Transmitter.Get().ToDictionary(r => r.Rule.Id, r => r.HitCount);
 			foreach (var record in FirewallRules.Where(record => hitCount.ContainsKey(record.Rule.Id)))
 				record.HitCount = hitCount[record.Rule.Id];
-			Dispatcher.Invoke(() => CollectionViewSource.GetDefaultView(DataGrid.ItemsSource).Refresh());
+			Dispatcher.Invoke(
+				() => {
+					try {
+						CollectionViewSource.GetDefaultView(DataGrid.ItemsSource).Refresh();
+					}
+					catch (InvalidOperationException) { }
+				}
+			);
 		};
 		timer.Start();
 	}
