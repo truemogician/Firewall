@@ -5,6 +5,7 @@ using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -28,7 +29,7 @@ public partial class MainWindow {
 				record.EnabledChanged += (_, _) => Transmitter.Post(FirewallRules);
 		};
 		try {
-			var records = Transmitter.Get();
+			var records = Transmitter.Get().Where(r => r.Present).ToList();
 			foreach (var record in records)
 				FirewallRules.Add(record);
 			FirewallRule.NextId = records.Select(r => r.Rule.Id).Max() + 1;
@@ -43,6 +44,7 @@ public partial class MainWindow {
 			var hitCount = Transmitter.Get().ToDictionary(r => r.Rule.Id, r => r.HitCount);
 			foreach (var record in FirewallRules.Where(record => hitCount.ContainsKey(record.Rule.Id)))
 				record.HitCount = hitCount[record.Rule.Id];
+			Dispatcher.Invoke(() => CollectionViewSource.GetDefaultView(DataGrid.ItemsSource).Refresh());
 		};
 		timer.Start();
 	}
