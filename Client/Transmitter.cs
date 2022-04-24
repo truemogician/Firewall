@@ -10,14 +10,30 @@ namespace Client;
 public static class Transmitter {
 	public static int OutBufferLength { get; set; } = 4 << 10;
 
+#if DEBUG
+	public static List<FirewallRuleRecord> MockedList { get; } = new() {
+		new FirewallRuleRecord(new FirewallRule("Example"))
+	};
+#endif
+
 	public static List<FirewallRuleRecord> Get() {
+#if DEBUG
+		return MockedList;
+#else
 		byte[] result = SyncBuffer(new byte[] { 0 });
 		return new List<FirewallRuleRecord>(DeserializeList(result, FirewallRuleRecord.Deserialize));
+#endif
 	}
 
 	public static bool Post(ICollection<FirewallRuleRecord> records) {
+#if DEBUG
+		MockedList.Clear();
+		MockedList.AddRange(records);
+		return true;
+#else
 		byte[] result = SyncBuffer(new byte[] { 1 }.Concat(SerializeList(records)).ToArray());
 		return result[0] != 0;
+#endif
 	}
 
 	public static byte[] SyncBuffer(byte[] input) {
