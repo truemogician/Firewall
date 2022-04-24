@@ -24,9 +24,10 @@ public partial class MainWindow {
 		source.StreamSource = new MemoryStream(Resource.Icon);
 		source.EndInit();
 		Icon = source;
-		FirewallRules.AddingNew += (_, args) => {
-			if (args.NewObject is FirewallRuleRecord record)
-				record.EnabledChanged += (_, _) => Transmitter.Post(FirewallRules);
+		void OnEnabledChanged(object? sender, EventArgs e) => Transmitter.Post(FirewallRules);
+		FirewallRules.ListChanged += (_, args) => {
+			if (args.ListChangedType == ListChangedType.ItemAdded)
+				FirewallRules[args.NewIndex].EnabledChanged += OnEnabledChanged;
 		};
 		try {
 			var records = Transmitter.Get().Where(r => r.Present).ToList();
@@ -49,7 +50,7 @@ public partial class MainWindow {
 		timer.Start();
 	}
 
-	public BindingList<FirewallRuleRecord> FirewallRules { get; } = new();
+	public BindingList<FirewallRuleRecord> FirewallRules { get; } = new() { AllowNew = false };
 
 	private void AddButtonClick(object sender, RoutedEventArgs e) {
 		var @new = AddRuleDialog.ShowDialog();
