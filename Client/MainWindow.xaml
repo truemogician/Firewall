@@ -8,20 +8,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="简易防火墙" Height="450" Width="500">
     <Grid>
-        <Grid.Resources>
-            <Style TargetType="{x:Type DataGridCell}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type DataGridCell}">
-                            <Grid Background="{TemplateBinding Background}">
-                                <ContentPresenter VerticalAlignment="Center" />
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </Grid.Resources>
-        <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding FirewallRules}">
+        <DataGrid Name="DataGrid" AutoGenerateColumns="False" ItemsSource="{Binding FirewallRules}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Rule.Id, Mode=OneWay}" />
                 <DataGridTextColumn Header="名称" Width="*" Binding="{Binding Rule.Name, Mode=OneWay}" />
